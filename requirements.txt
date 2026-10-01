@@ -1,0 +1,29 @@
+﻿# Avatar Interactivo - dependencias
+# Instaladas y verificadas en Python 3.14.4 / Windows x64.
+#
+# NOTA IMPORTANTE:
+#   - Usa "pygame-ce" (Community Edition): es el paquete de pygame que publica
+#     ruedas para Python 3.13/3.14. "pygame" oficial no tiene rueda para 3.14.
+#   - opencv-python debe ser <=4.10.x en este equipo: las versiones 5.x y las
+#     headless >=4.12 fallan al instalar/importar aqui.
+#   - numpy 2.x SI funciona con opencv-python 4.10 en este equipo (verificado
+#     con numpy 2.5.3). Antes mediapipe arrastraba numpy 1.26.4 y se creia
+#     incompatible; ya no hace falta fijar numpy 1.x.
+#   - OJO: mediapipe depende de opencv-contrib-python (que pide la 5.x) y este
+#     proyecto fija opencv-python 4.10. Las dos distribuciones escriben en el
+#     MISMO modulo "cv2", asi que gana la que se instalo la ultima. Si tras
+#     instalar cv2 aparece como 5.x, no funciona aqui (Smart App Control) y hay
+#     que reinstalar a mano la buena:
+#         pip install --force-reinstall --no-deps opencv-python==4.10.0.84
+#     scripts/check_env.py avisa si detecta el conflicto.
+
+mediapipe==1.0.1
+opencv-python==4.10.0.84
+pygame-ce==2.5.8
+PyYAML==6.0.3
+screeninfo==0.8.1
+numpy>=1.24
+
+# pygrabber lista las camaras por NOMBRE via DirectShow sin abrirlas.
+# Sin el, la app no puede elegir la USB y cae al indice de config.yaml.
+pygrabber==0.2

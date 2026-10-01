@@ -1,0 +1,183 @@
+# Tabla de gestos, reacciones y sonidos.
+#
+# expression : cara que pone el avatar (ver EXPRESSIONS en src/avatar.py)
+# priority   : si dos gestos se disparan a la vez, gana el de mayor numero.
+#              Asi "shock" (90) pisa a "mouth_open" (40) y la cara nunca
+#              muestra algo que no corresponda al gesto.
+# sound      : fichero en assets/sounds/ (CC0). Si no existe, se usa fallback.
+
+gestures:
+  - id: shock
+    name: "Ojos muy abiertos + boca muy abierta"
+    search_terms: ["mind blown", "explosion cartoon"]
+    sound: "shock"
+    fallback: "boom"
+    reaction:
+      type: "expression"
+      expression: "shock"
+      duration_ms: 2200
+      priority: 90
+
+  - id: mouth_open
+    name: "Boca abierta"
+    search_terms: ["surprise wow", "cartoon gasp"]
+    sound: "mouth_open"
+    fallback: "gasp"
+    reaction:
+      type: "expression"
+      expression: "surprise"
+      duration_ms: 1400
+      priority: 40
+
+  - id: frown
+    name: "Fruncir cenio"
+    search_terms: ["grumpy", "ugh cartoon"]
+    sound: "frown"
+    fallback: "buzz"
+    reaction:
+      type: "expression"
+      expression: "grumpy"
+      duration_ms: 1800
+      priority: 50
+
+  - id: big_smile
+    name: "Sonrisa amplia"
+    search_terms: ["cheer", "happy short"]
+    sound: "big_smile"
+    fallback: "chime_up"
+    reaction:
+      type: "expression"
+      expression: "happy"
+      duration_ms: 1800
+      priority: 45
+
+  - id: eyebrows_up
+    name: "Levantar cejas"
+    search_terms: ["ooh", "cartoon surprise"]
+    sound: "eyebrows_up"
+    fallback: "ooh"
+    reaction:
+      type: "expression"
+      expression: "alert"
+      duration_ms: 1400
+      priority: 30
+
+  - id: wink
+    name: "Guino (wink)"
+    search_terms: ["boing", "cartoon pop", "meme wink"]
+    sound: "wink"
+    fallback: "pop"
+    reaction:
+      type: "expression"
+      expression: "wink"
+      duration_ms: 1200
+      priority: 60
+
+  - id: head_tilt
+    name: "Cabeza inclinada"
+    search_terms: ["curious", "hmm cartoon"]
+    sound: "head_tilt"
+    fallback: "hum"
+    reaction:
+      type: "expression"
+      expression: "curious"
+      duration_ms: 2000
+      priority: 35
+
+  - id: head_shake_fast
+    name: "Sacudir cabeza rapido"
+    search_terms: ["bruh", "what cartoon"]
+    sound: "head_shake_fast"
+    fallback: "womp_womp"
+    reaction:
+      type: "expression"
+      expression: "confused"
+      duration_ms: 1800
+      priority: 70
+  - id: nod
+    name: "Asentir (nod)"
+    search_terms: ["yes", "okay cartoon"]
+    sound: "nod"
+    fallback: "nod"
+    reaction:
+      type: "expression"
+      expression: "affirm"
+      duration_ms: 1200
+      priority: 55
+
+  - id: shake
+    name: "Negar (shake)"
+    search_terms: ["no", "nah cartoon"]
+    sound: "shake"
+    fallback: "womp"
+    reaction:
+      type: "expression"
+      expression: "deny"
+      duration_ms: 1200
+      priority: 55
+
+  - id: thumbs_up
+    name: "Pulgares arriba"
+    search_terms: ["success", "yay", "applause short"]
+    sound: "thumbs_up"
+    fallback: "yay"
+    reaction:
+      type: "expression"
+      expression: "happy"
+      duration_ms: 1800
+      priority: 65
+
+  - id: victory
+    name: "Sena V"
+    search_terms: ["win", "victory cheer"]
+    sound: "victory"
+    fallback: "fanfare"
+    reaction:
+      type: "expression"
+      expression: "excited"
+      duration_ms: 2000
+      priority: 75
+
+  - id: hands_up
+    name: "Manos levantadas"
+    search_terms: ["yeah", "party pop"]
+    sound: "hands_up"
+    fallback: "pop"
+    reaction:
+      type: "expression"
+      expression: "celebrate"
+      duration_ms: 2400
+      priority: 80
+
+  - id: fist
+    name: "Puno cerrado"
+    search_terms: ["power", "punch whoosh"]
+    sound: "fist"
+    fallback: "whoosh"
+    reaction:
+      type: "expression"
+      expression: "powered"
+      duration_ms: 1600
+      priority: 60
+
+  - id: open_palm
+    name: "Palma abierta"
+    search_terms: ["stop", "whoa cartoon"]
+    sound: "open_palm"
+    fallback: "whoa"
+    reaction:
+      type: "expression"
+      expression: "stop"
+      duration_ms: 1600
+      priority: 60
+
+  - id: tongue_out
+    name: "Lengua fuera (boca muy abierta sin sonrisa)"
+    search_terms: ["silly", "bleh cartoon"]
+    sound: "tongue_out"
+    fallback: "bleh"
+    reaction:
+      type: "expression"
+      expression: "silly"
+      duration_ms: 1800
+      priority: 45

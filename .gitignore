@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
+
+# Modelos de MediaPipe (~11 MB, se descargan con scripts/download_models.py)
+models/*.task
+
+# Salidas de pruebas
+out/
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

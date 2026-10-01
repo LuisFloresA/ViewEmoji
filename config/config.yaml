@@ -1,0 +1,86 @@
+﻿# Configuración Avatar Interactivo
+
+# Cámara
+# La camara se elige POR NOMBRE (DirectShow), sin abrir las demas: asi no
+# parpadean los LED de todas las cams al arrancar.
+camera:
+  prefer_usb: true          # elegir la externa antes que la integrada
+  device_index: -1          # -1 = autodetectar por nombre; >=0 = indice fijo
+  device_name: ""           # texto a buscar en el nombre (p.ej. "ViewSonic")
+  width: 1280
+  height: 720
+  fps: 30
+
+# Pantallas
+display:
+  use_second_screen: true
+  fullscreen: true
+  borderless: true
+
+# Avatar
+avatar:
+  # La cara ocupa este porcentaje de la ALTURA de la pantalla (0.70 = 70%).
+  # Sube a 0.80 o 0.85 si la quieres aun mas grande.
+  size_ratio: 0.70
+  size: null            # si lo rellenas, ignora size_ratio y fija el tamano
+
+  smooth_factor: 0.22        # suavizado del seguimiento (mas bajo = mas fluido)
+  look_limit: 1.0            # tope del desplazamiento de pupilas
+
+  # Mezcla del seguimiento de mirada:
+  #   gaze_w_pos  peso de "donde esta la persona" (resto = su gaze real)
+  #   gaze_w_vel  ganancia sobre la velocidad, para perseguir el movimiento
+  gaze_w_pos: 0.75
+  gaze_w_vel: 2.4
+
+  blink_interval_min: 1.8
+  blink_interval_max: 4.2
+
+  # Acciones cuando no hay nadie (el emoji tiene vida propia)
+  idle_enabled: true
+  idle_min_gap: 5.0      # segundos minimos entre acciones idle
+  idle_max_gap: 12.0     # segundos maximos entre acciones idle
+
+# Seguimiento de mirada real (desplazamiento del iris)
+gaze:
+  # Ganancia del desplazamiento del iris respecto al centro del ojo (-1..1).
+  # Medida con la camara real: sin ganancia el desplazamiento es pequeno y
+  # con demasiada el avatar se clava en los extremos.
+  gain_x: 9.0
+  gain_y: 7.0
+  # Aprendizaje de la postura neutra ("mirar al frente"): lento y limitado a
+  # una zona muerta, para que mirar fijamente a un lado no se tome como neutro.
+  base_k: 0.03
+  deadzone: 0.02
+
+# Gestos
+gestures:
+  enabled: true
+  cooldown_ms: 800  # minimo entre repeticiones del mismo gesto
+  min_hold_frames: 3  # frames de postura mantenida antes de disparar
+  rearm_frames: 6  # frames en los que NO hay postura para poder repetir
+  head_tilt_threshold_deg: 15
+  head_nod_min_count: 2
+  head_shake_min_count: 2
+  # Segundos minimos entre cambios de lado para contar como "sacudida rapida".
+  # Bajalo si te la salta; subelo si un vaiven lento la dispara.
+  head_shake_min_interval_s: 0.28
+
+# Audio
+audio:
+  enabled: true
+  volume: 0.7
+  use_fallback: true
+  prefer_ogg: true
+
+# Actualizaciones
+updates:
+  enabled: true
+  polling_minutes: 10
+  repo_path: "."
+  auto_restart: true
+
+# Debug
+debug:
+  show_landmarks: false
+  show_fps: false
