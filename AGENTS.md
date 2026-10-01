@@ -175,7 +175,33 @@ reinstala. Sin ese paso, la app no habría arrancado en una máquina nueva.
 > destruye variables si no se usa `endlocal & exit /b %VAR%`); en Python es
 > código normal y testeable. El `.bat` solo busca un intérprete y llama.
 
-### 2.4 Arreglos adicionales no pedidos
+### 2.4 Petición 10: elegir la cámara en el `.bat`
+
+En el otro equipo la cámara no cargó. Dos causas posibles, y el selector
+distingue las dos: la USB tiene otro nombre, o bien otro programa la tiene
+ocupada.
+
+- `scripts\select_camera.py` lista las cámaras **por nombre sin abrirlas**,
+  deja elegir una y la anota en `config/config.yaml`.
+- `run.bat` ofrece el selector **solo si el arranque falla**, no siempre:
+  en el AIO debe arrancar solo y sin preguntar nada.
+- `main.py` lista las cámaras que ve al fallar, en vez de un escueto
+  "sin camara disponible" que no dice si el problema es que no hay, si
+  está ocupada o si el config apunta a la equivocada.
+
+> Decisión: se guarda el **nombre**, no el índice. DirectShow no garantiza
+> el mismo orden entre arranques ni entre equipos, así que un `device_index`
+> fijo puede acabar abriendo la integrada. Con `device_name`,
+> `pick_index` busca el texto en cada arranque y el índice guardado queda
+> solo como reserva.
+
+> Decisión: el selector **no** usa `yaml.safe_dump`. Ese volcado borraba 36
+> líneas de los 23 comentarios de `config.yaml`, que explican los límites de
+> cada valor. Se reescribe solo la línea elegida y se conserva su comentario
+> (`set_yaml_key`); `smoke_test.py::test_config_rewrite` lo vigila, incluido
+> que `--auto` deje el archivo byte a byte igual.
+
+### 2.5 Arreglos adicionales no pedidos
 
 Salieron al verificar, y se corrigieron:
 
@@ -255,6 +281,7 @@ config/
 scripts/
   smoke_test.py           (447)  pruebas sin hardware
   test_camera.py           (43)  pruebas de selección de cámara (no abre nada)
+  select_camera.py         (~150) selector interactivo: nombre de cámara a config.yaml
   check_env.py             (99)  diagnóstico; avisa del conflicto de OpenCV
   gaze_probe.py            (93)  mide la mirada en vivo (cámara real)
   calibrate_gaze.py       (101)  compara fórmulas de gaze sobre landmarks crudos
@@ -302,7 +329,14 @@ venv\Scripts\python.exe scripts\gaze_probe.py 20
 `head_shake_fast`) · **cobertura completa de la tabla** · sin rostro no hay
 falsos positivos · disparo por flanco y rearme · prioridades (incluido el
 descarte de la expresión) · bandas de boca excluyentes · tamaño de cara en
-720p/1080p · 8+ acciones idle · render de 21 expresiones · audio 16/16.
+720p/1080p · 8+ acciones idle · render de 21 expresiones · audio 16/16 ·
+reescritura de `config.yaml` sin perder comentarios.
+
+> `test_config_rewrite()` importa `select_camera.set_yaml_key` y comprueba
+> que reescribe el valor, conserva el comentario, no toca el resto del
+> archivo y que `--auto` deja `config/config.yaml` byte a byte igual. Sin
+> ese test, el selector podría borrar los 23 comentarios del YAML y nadie
+> se enteraría hasta perderlos.
 
 ### Cómo leer `gaze_probe.py`
 
@@ -363,7 +397,7 @@ Cosas que fallan aquí y que conviene no deshacer:
   que exista tras clonar (git no rastrea carpetas vacías).
 - **Actualizaciones por `update_check.py`:** hace `git reset --hard` si el
   remoto trae commits. Ojo en un repo con trabajo sin commitear.
-- **Las 4 peticiones originales de la §2.1 están hechas, y también la 9.**
+- **Las peticiones originales de la §2.1 están hechas, y también la 9 y la 10.**
 - **La instalación necesita internet** (PyPI y el CDN de Google para los
   modelos). En una máquina sin red hay que copiar `models/` a mano.
 

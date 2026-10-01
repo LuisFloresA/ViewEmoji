@@ -71,15 +71,56 @@ echo.
 "%PY%" -u src\main.py
 set CODE=%ERRORLEVEL%
 
+REM --- Si no arranco, casi siempre es la camara: otro programa la tiene
+REM ocupada, o config.yaml apunta a la equivocada. Se ofrece elegirla y
+REM reintentar una vez, en vez de dejar al usuario solo frente al error.
+if not "%CODE%"=="0" goto :reintentar
+
 echo.
+echo Avatar cerrado correctamente.
+goto :salir
+
+:reintentar
+echo.
+echo El avatar termino con codigo %CODE%.
+echo.
+REM --multiple devuelve 0 solo si hay mas de una camara. Con una sola
+REM no hay nada que elegir y no se molesta al usuario con la pregunta.
+"%PY%" scripts\select_camera.py --multiple
+if errorlevel 1 goto :fin
+
+echo Hay varias camaras y no se pudo arrancar.
+echo Si la camara correcta no es la que se eligio sola, o si otro programa
+echo la tiene ocupada, cerralo y vuelve a ejecutar.
+echo.
+set /p ELEGIR=Elegir camara ahora y reintentar? (S/N)
+if /i not "%ELEGIR%"=="S" goto :fin
+
+"%PY%" scripts\select_camera.py
+if errorlevel 1 goto :fin
+
+echo.
+echo Reintentando con la camara elegida...
+echo.
+"%PY%" -u src\main.py
+set CODE=%ERRORLEVEL%
 if "%CODE%"=="0" (
+  echo.
   echo Avatar cerrado correctamente.
-) else (
-  echo El avatar termino con codigo %CODE%.
+  goto :salir
 )
 echo.
+echo El avatar termino con codigo %CODE% otra vez.
+echo Revisa el listado de camaras de arriba.
+
+:salir
+echo.
 pause
-goto :fin
+
+:fin
+REM Mismo idioma: CODE se expande en la misma linea que endlocal, porque
+REM separado el endlocal lo borraria antes de expandirse.
+endlocal & exit /b %CODE%
 
 :fin
 REM Mismo idioma: CODE se expande en la misma linea que endlocal, porque

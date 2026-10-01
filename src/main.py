@@ -24,7 +24,7 @@ except ImportError:
 
 from audio import SoundEngine
 from avatar import Avatar
-from camera import open_camera
+from camera import list_camera_names, open_camera
 from config import load_config, load_gestures
 from gestures import Detector, GestureEngine
 
@@ -73,6 +73,22 @@ def main():
     cap = open_camera(cfg)
     if cap is None:
         print("[fatal] sin camara disponible")
+        # Sin esto el usuario solo ve "sin camara disponible" y no sabe si
+        # el problema es que no hay camara, que otro programa la tiene
+        # ocupada, o que config.yaml apunta a la equivocada. En el AIO esto
+        # es justo el fallo que mas veces toca diagnosticar.
+        nombres = list_camera_names()
+        if nombres:
+            print(f"[fatal] este equipo ve {len(nombres)} camara(s):")
+            for i, n in enumerate(nombres):
+                print(f"[fatal]   [{i}] {n}")
+        else:
+            print("[fatal] no se pudieron ni leer los nombres de las camaras "
+                  "(falta pygrabber).")
+        print("[fatal] si la correcta esta en la lista pero no se abre, "
+              "probablemente otro programa la tenga ocupada.")
+        print("[fatal] para elegir camara:  scripts\\run.bat  (opcion de "
+              "emergencia)  o  scripts\\select_camera.py")
         return 1
 
     gcfg = cfg.get("gaze", {})

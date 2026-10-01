@@ -423,6 +423,52 @@ def test_fallback_files(gdefs):
     return True
 
 
+def test_config_rewrite():
+    """select_camera.py no puede romper config.yaml.
+
+    Importa el helper sin tocar el disco y comprueba tres cosas:
+    reescribe el valor, conserva el comentario de la linea y NO toca el
+    resto del archivo. Sin esto, elegir camara en el AIO podria dejar el
+    YAML sin los 23 comentarios que explican los limites de cada valor.
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import select_camera
+
+    texto = ('camera:\n'
+             '  device_index: -1          # -1 = autodetectar\n'
+             '  device_name: ""           # texto a buscar\n'
+             'fps: 30\n')
+    out = select_camera.set_yaml_key(texto, "device_index", "2")
+    if "device_index: 2" not in out:
+        print("[FALLO] set_yaml_key no reescribio device_index")
+        return False
+    if "# -1 = autodetectar" not in out:
+        print("[FALLO] set_yaml_key perdio el comentario de la linea")
+        return False
+    if "fps: 30" not in out:
+        print("[FALLO] set_yaml_key toco el resto del archivo")
+        return False
+    if select_camera.set_yaml_key(texto, "no_existe", "x") != texto:
+        print("[FALLO] set_yaml_key modifico algo con una clave inexistente")
+        return False
+    # Nombre largo: el comentario debe sobrevivir en su propia linea.
+    largo = select_camera.set_yaml_key(texto, "device_name",
+                                        '"Integrated Camera"')
+    if '"Integrated Camera"' not in largo or "# texto a buscar" not in largo:
+        print("[FALLO] set_yaml_key fallo con un valor largo")
+        return False
+    # El archivo real tiene que seguir siendo valido tras la operacion.
+    real = ROOT / "config" / "config.yaml"
+    antes = real.read_text(encoding="utf-8")
+    cal = select_camera.set_yaml_key(antes, "device_index", "-1")
+    cal = select_camera.set_yaml_key(cal, "device_name", '""')
+    if cal != antes:
+        print("[FALLO] --auto no dejaria config.yaml intacto")
+        return False
+    print("[OK] config.yaml se reescribe sin perder comentarios")
+    return True
+
+
 def main():
     print("=" * 50)
     print("  SMOKE TEST - Avatar Interactivo")
@@ -437,6 +483,7 @@ def main():
     ok &= test_face_size()
     ok &= test_idle()
     ok &= test_render()
+    ok &= test_config_rewrite()
     test_audio(gdefs)
     print("=" * 50)
     print("RESULTADO:", "TODO OK" if ok else "HAY FALLOS")

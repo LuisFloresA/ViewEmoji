@@ -116,9 +116,32 @@ camera:
   device_name: ""       # texto a buscar (p.ej. "ViewSonic") si el auto falla
 ```
 
-Si el nombre de tu camara USB cambia, ponlo en `device_name` o fija
-`device_index`. `scripts\test_camera.py` prueba la logica de seleccion sin
-tocar ningun dispositivo.
+### Si no carga la camara
+
+No hace falta editar el YAML a mano:
+
+```bat
+scripts\select_camera.py
+```
+
+Lista las camaras **por nombre sin abrirlas**, deja elegir una y la anota
+en `config/config.yaml`. `run.bat` además ofrece esto solo si el arranque
+falla, para no molestar cuando todo va bien.
+
+Se guarda el **nombre**, no el índice: DirectShow no garantiza el mismo
+orden entre arranques, así que un índice fijo puede acabar apuntando a la
+integrada. Para volver al comportamiento automático:
+
+```bat
+scripts\select_camera.py --auto
+```
+
+Si la camara aparece en el listado pero no se abre, casi siempre es otro
+programa (Zoom, Teams, el navegador, la cámara de Windows) la tiene
+ocupada: ciérralo y reintenta.
+
+`scripts\test_camera.py` prueba la logica de seleccion sin tocar ningun
+dispositivo.
 
 ```
 src/
@@ -134,18 +157,19 @@ config/
   gestures.yaml     tabla de gestos -> reaccion + sonido (fuente de verdad)
 
 scripts/
-  install.bat                prepara el entorno: venv + deps + modelos
-  bootstrap.py               la logica de instalacion (Python, no batch)
-  check_env.py             diagnostico de dependencias, monitores y camaras
-  test_camera.py           pruebas de seleccion de camara (no abre nada)
-  smoke_test.py            pruebas sin hardware (render, gestos, idle, audio)
-  gaze_probe.py            mide la mirada en vivo con la camara real
-  calibrate_gaze.py        compara formulas de gaze sobre landmarks crudos
-  make_expr_sheet.py       genera docs/img/expresiones.png
-  download_models.py       descarga los .task de MediaPipe
+  install.bat             prepara el entorno: venv + deps + modelos
+  bootstrap.py            la logica de instalacion (Python, no batch)
+  run.bat                 arranque comodo (instala si falta)
+  select_camera.py        elige camara y la anota en config.yaml
+  check_env.py            diagnostico de dependencias, monitores y camaras
+  test_camera.py          pruebas de seleccion de camara (no abre nada)
+  smoke_test.py           pruebas sin hardware (render, gestos, idle, audio)
+  gaze_probe.py           mide la mirada en vivo con la camara real
+  calibrate_gaze.py       compara formulas de gaze sobre landmarks crudos
+  make_expr_sheet.py      genera docs/img/expresiones.png
+  download_models.py      descarga los .task de MediaPipe
   generate_fallback_sounds.py  genera los tonos de respaldo
-  update_check.py          polling de actualizaciones por git
-  run.bat                  arranque comodo (instala solo si falta)
+  update_check.py         polling de actualizaciones por git
 
 docs/
   GESTOS_SONIDOS.md   tabla gestos / reacciones / sonidos / terminos CC0
