@@ -71,29 +71,23 @@ echo.
 "%PY%" -u src\main.py
 set CODE=%ERRORLEVEL%
 
-REM --- Si no arranco, casi siempre es la camara: otro programa la tiene
-REM ocupada, o config.yaml apunta a la equivocada. Se ofrece elegirla y
-REM reintentar una vez, en vez de dejar al usuario solo frente al error.
-if not "%CODE%"=="0" goto :reintentar
-
 echo.
-echo Avatar cerrado correctamente.
-goto :salir
-
-:reintentar
-echo.
+if "%CODE%"=="0" (
+  echo Avatar cerrado correctamente.
+  goto :salir
+)
 echo El avatar termino con codigo %CODE%.
-echo.
-REM --multiple devuelve 0 solo si hay mas de una camara. Con una sola
-REM no hay nada que elegir y no se molesta al usuario con la pregunta.
-"%PY%" scripts\select_camera.py --multiple
-if errorlevel 1 goto :fin
 
-echo Hay varias camaras y no se pudo arrancar.
-echo Si la camara correcta no es la que se eligio sola, o si otro programa
-echo la tiene ocupada, cerralo y vuelve a ejecutar.
+REM main.py devuelve 3 cuando el fallo es la camara. Cualquier otro
+REM codigo (entorno roto, error de Python) no se arregla eligiendo una
+REM camara, asi que no se pregunta.
+if not "%CODE%"=="3" goto :salir
+
 echo.
-set /p ELEGIR=Elegir camara ahora y reintentar? (S/N)
+echo Lo mas probable es la camara: que otro programa la tenga ocupada, o
+echo que config/config.yaml apunte a la equivocada.
+echo.
+set /p ELEGIR=Ver las camaras de este equipo y elegir una? (S/N)
 if /i not "%ELEGIR%"=="S" goto :fin
 
 "%PY%" scripts\select_camera.py
@@ -111,7 +105,9 @@ if "%CODE%"=="0" (
 )
 echo.
 echo El avatar termino con codigo %CODE% otra vez.
-echo Revisa el listado de camaras de arriba.
+echo Si la camara aparece en el listado pero no se abre, otro programa la
+echo tiene ocupada: cierra Zoom, Teams, el navegador o la Camara de
+echo Windows y vuelve a ejecutar este script.
 
 :salir
 echo.

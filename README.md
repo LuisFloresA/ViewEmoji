@@ -124,23 +124,40 @@ No hace falta editar el YAML a mano:
 scripts\select_camera.py
 ```
 
-Lista las camaras **por nombre sin abrirlas**, deja elegir una y la anota
-en `config/config.yaml`. `run.bat` además ofrece esto solo si el arranque
-falla, para no molestar cuando todo va bien.
+Muestra **todas las cámaras que puede encontrar** y tú eliges una con su
+número. Hay dos formas de localizarlas, porque no siempre coinciden:
 
-Se guarda el **nombre**, no el índice: DirectShow no garantiza el mismo
-orden entre arranques, así que un índice fijo puede acabar apuntando a la
-integrada. Para volver al comportamiento automático:
+- Por **nombre** con DirectShow (`pygrabber`), sin abrir nada.
+- **Abriendo cada índice** uno a uno. Es la única forma de encontrar una
+  cámara que se registra solo bajo Media Foundation: Windows la ve, pero
+  DirectShow no la lista.
+
+Por eso el script sí abre cámaras al buscar. Con `--sin-sondeo` se limita a
+los nombres, sin tocar los dispositivos.
+
+Lo que se guarda depende de la cámara elegida:
+
+| Caso | Qué se guarda | Riesgo |
+|---|---|---|
+| Tiene nombre | `device_name` + índice de reserva | bajo: se busca por texto al arrancar |
+| No tiene nombre | solo `device_index` (fijo) | si al reiniciar cambia el orden, hay que volver a elegir |
+
+El script avisa de cuál de los dos casos es. Se anota en
+`config/config.yaml` conservando sus comentarios.
+
+`run.bat` ofrece el selector **solo si el arranque falla por la cámara**
+(`main.py` devuelve el código 3), para no molestar cuando todo va bien.
+Para volver al comportamiento automático:
 
 ```bat
 scripts\select_camera.py --auto
 ```
 
-Si la camara aparece en el listado pero no se abre, casi siempre es otro
+Si la cámara aparece en el listado pero no se abre, casi siempre es otro
 programa (Zoom, Teams, el navegador, la cámara de Windows) la tiene
 ocupada: ciérralo y reintenta.
 
-`scripts\test_camera.py` prueba la logica de seleccion sin tocar ningun
+`scripts\test_camera.py` prueba la lógica de selección sin tocar ningún
 dispositivo.
 
 ```

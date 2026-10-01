@@ -175,31 +175,52 @@ reinstala. Sin ese paso, la app no habría arrancado en una máquina nueva.
 > destruye variables si no se usa `endlocal & exit /b %VAR%`); en Python es
 > código normal y testeable. El `.bat` solo busca un intérprete y llama.
 
-### 2.4 Petición 10: elegir la cámara en el `.bat`
+### 2.4 Petición 10: elegir la cámara a mano
 
-En el otro equipo la cámara no cargó. Dos causas posibles, y el selector
+En el otro equipo la USB no cargaba. Dos causas posibles, y el selector
 distingue las dos: la USB tiene otro nombre, o bien otro programa la tiene
 ocupada.
 
-- `scripts\select_camera.py` lista las cámaras **por nombre sin abrirlas**,
-  deja elegir una y la anota en `config/config.yaml`.
-- `run.bat` ofrece el selector **solo si el arranque falla**, no siempre:
-  en el AIO debe arrancar solo y sin preguntar nada.
+- `scripts\select_camera.py` muestra todas las cámaras que encuentra y deja
+  elegir una. `run.bat` lo ofrece **solo si el arranque falla por la
+  cámara**, no siempre: en el AIO debe arrancar solo y sin preguntar nada.
 - `main.py` lista las cámaras que ve al fallar, en vez de un escueto
   "sin camara disponible" que no dice si el problema es que no hay, si
-  está ocupada o si el config apunta a la equivocada.
+  está ocupada o si el config apunta a la equivocada. Devuelve el código
+  **3**, que `run.bat` usa para distinguir el fallo de cámara de cualquier
+  otro (entorno roto, error de Python), donde elegir una cámara no arregla
+  nada.
 
-> Decisión: se guarda el **nombre**, no el índice. DirectShow no garantiza
-> el mismo orden entre arranques ni entre equipos, así que un `device_index`
-> fijo puede acabar abriendo la integrada. Con `device_name`,
-> `pick_index` busca el texto en cada arranque y el índice guardado queda
-> solo como reserva.
+> Decisión: el selector **sondea los índices abriendo cada cámara**, además
+> de listar los nombres de DirectShow. No es descuido: si la USB se
+> registra solo bajo Media Foundation, `pygrabber` no la lista pero
+> `cv2.VideoCapture(i)` con `CAP_MSMF` sí la abre. Sin el sondeo, el
+> selector no podría ofrecerla y parecería que no hay cámara, que es
+> justo el fallo reportado.
+
+> Decisión: se guarda el **nombre** cuando existe, y solo el índice cuando
+> no. Un `device_index` fijo puede acabar abriendo la integrada si
+> DirectShow reordena al reiniciar; pero una cámara sin nombre no deja otra
+> opción, y el script avisa de ese caso. Con `device_name`, `pick_index`
+> busca el texto en cada arranque y el índice queda como reserva.
 
 > Decisión: el selector **no** usa `yaml.safe_dump`. Ese volcado borraba 36
 > líneas de los 23 comentarios de `config.yaml`, que explican los límites de
 > cada valor. Se reescribe solo la línea elegida y se conserva su comentario
 > (`set_yaml_key`); `smoke_test.py::test_config_rewrite` lo vigila, incluido
 > que `--auto` deje el archivo byte a byte igual.
+
+> `set_yaml_key` recibe una lista `found` para informar de si la clave
+> existía. Sin eso no se puede distinguir "la clave no está" de "el valor ya
+> era este": con un config ya en autodeteccion, `--auto` devuelve el texto
+> sin cambios y parecería un error.
+
+> El sondeo silencia `stderr`/`stdout` a nivel de descriptor
+> (`_silencioso`). `cv2.utils.logging.setLogLevel` **no** basta: los avisos
+> de "backend can't be used to capture by index" y "Camera index out of
+> range" los escribe el backend de captura directamente en el descriptor,
+> y al explorar índices a propósito saldrían en cada intento, tapando el
+> listado que tiene que leer el usuario.
 
 ### 2.5 Arreglos adicionales no pedidos
 

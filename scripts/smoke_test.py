@@ -451,6 +451,18 @@ def test_config_rewrite():
     if select_camera.set_yaml_key(texto, "no_existe", "x") != texto:
         print("[FALLO] set_yaml_key modifico algo con una clave inexistente")
         return False
+    # `found` debe distinguir "clave ausente" de "el valor ya era este":
+    # --auto sobre un config ya en autodeteccion devuelve el texto igual.
+    marca: list = []
+    select_camera.set_yaml_key(texto, "device_index", "-1", marca)
+    if marca != [True]:
+        print("[FALLO] set_yaml_key no aviso de que la clave existe")
+        return False
+    marca.clear()
+    select_camera.set_yaml_key(texto, "no_existe", "x", marca)
+    if marca != [False]:
+        print("[FALLO] set_yaml_key no aviso de que la clave falta")
+        return False
     # Nombre largo: el comentario debe sobrevivir en su propia linea.
     largo = select_camera.set_yaml_key(texto, "device_name",
                                         '"Integrated Camera"')

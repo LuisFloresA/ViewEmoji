@@ -83,13 +83,15 @@ def main():
             for i, n in enumerate(nombres):
                 print(f"[fatal]   [{i}] {n}")
         else:
-            print("[fatal] no se pudieron ni leer los nombres de las camaras "
-                  "(falta pygrabber).")
+            print("[fatal] DirectShow no lista ninguna camara. Se puede "
+                  "comprobar si alguna abre aun sin nombre con: "
+                  "scripts\\select_camera.py --list")
         print("[fatal] si la correcta esta en la lista pero no se abre, "
               "probablemente otro programa la tenga ocupada.")
-        print("[fatal] para elegir camara:  scripts\\run.bat  (opcion de "
-              "emergencia)  o  scripts\\select_camera.py")
-        return 1
+        print("[fatal] para elegir camara:  scripts\\select_camera.py")
+        # Codigo propio: run.bat lo usa para ofrecer el selector solo
+        # cuando el fallo es de camara, no por cualquier otro motivo.
+        return 3
 
     gcfg = cfg.get("gaze", {})
     detector = Detector(
